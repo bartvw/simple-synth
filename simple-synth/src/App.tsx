@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
+import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror'
+import { javascript } from '@codemirror/lang-javascript';
 import './App.css'
 
 
@@ -6,13 +8,22 @@ function App() {
   const [count, setCount] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const [code, setCode] = useState(`function wave(t) {
+    return Math.sin(2 * Math.PI * 440 * t);
+  }`);
+  
+  useEffect(() => {
+    window.eval(code);
+  }, []);
+  
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const generatorRef = useRef<ScriptProcessorNode | null>(null);
 
   const handlePlayClick = () => {
     audioContextRef.current = new AudioContext();
 
-    generatorRef.current = audioContextRef.current.createScriptProcessor(4096, 1, 1);
+    generatorRef.current = audioContextRef.current.createScriptProcessor(8192, 1, 1);
     generatorRef.current.onaudioprocess = (audioProcessingEvent: AudioProcessingEvent): void => {
       const outputBuffer = audioProcessingEvent.outputBuffer.getChannelData(0);
       const sampleRate = audioContextRef.current?.sampleRate;
@@ -40,16 +51,9 @@ function App() {
     setIsPlaying(false);
   };
 
-  const [code, setCode] = useState(`function wave(t) {
-  return Math.sin(2 * Math.PI * 440 * t);
-}`);
 
-  useEffect(() => {
-    window.eval(code);
-  }, []);
-
-  const handleCodeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newCode = e.target.value;
+  const handleCodeChange = (viewUpdate: ViewUpdate) => {
+    const newCode = viewUpdate.view.state.doc.toString();
     setCode(newCode);
     try {
       //evaluate the code and make sure that if any functions are defined, they are available in the global scope
@@ -68,16 +72,16 @@ function App() {
           {isPlaying ? 'Stop' : 'Play'}
         </button>
       </div>
-      <div className="editor">
-        <textarea
-          className="code-editor"
-          spellCheck="false"
-          style={{ width: '100ch', height: '100vh' }}
-          value={code}
-          onChange={handleCodeChange}
-          lang="javascript"
-        />
-      </div>
+      <CodeMirror
+        value={code}
+        onUpdate={handleCodeChange}
+        style={{ textAlign: 'left' }}
+        height="200px"
+        width='800px'
+        extensions={[javascript({ jsx: true })]}
+        lang="javascript"
+      />
+    
     </>
   )
 }
