@@ -7,14 +7,13 @@ import initialCode from '../example.js?raw'
 function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [code, setCode] = useState(initialCode);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const generatorRef = useRef<ScriptProcessorNode | null>(null);
 
   useEffect(() => {
     window.eval(code);
   }, []);
-
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const generatorRef = useRef<ScriptProcessorNode | null>(null);
-
+  
   const handlePlayClick = () => {
     audioContextRef.current = new AudioContext();
 
@@ -25,34 +24,29 @@ function App() {
 
       // Using Array.prototype.forEach for functional iteration
       outputBuffer.forEach((_, index) => {
-
         if (typeof (window as any).wave === 'function') {
           outputBuffer[index] = (window as any).wave(audioProcessingEvent.playbackTime + index / sampleRate!);
         }
-
       });
     };
 
-    generatorRef.current.connect(audioContextRef.current.destination); // Connect the oscillator to the destination node
-
-    console.log("Playing");
-
+    generatorRef.current.connect(audioContextRef.current.destination); 
     setIsPlaying(true);
     audioContextRef.current.resume();
   };
 
   const handleStopClick = () => {
     generatorRef.current?.disconnect();
-    console.log("Stopped");
     setIsPlaying(false);
   };
 
 
   const handleCodeChange = (viewUpdate: ViewUpdate) => {
+    if (!viewUpdate.docChanged) return;
+
     const newCode = viewUpdate.view.state.doc.toString();
     setCode(newCode);
     try {
-      //evaluate the code and make sure that if any functions are defined, they are available in the global scope
       // eslint-disable-next-line
       window.eval(newCode);
     } catch (error) {
@@ -65,6 +59,7 @@ function App() {
       <button onClick={isPlaying ? handleStopClick : handlePlayClick}>
         {isPlaying ? '⏹️' : '▶️'}
       </button>
+      <p>Edit the <code>wave</code> function below to change the sound.</p>
       <CodeMirror
         value={code}
         onUpdate={handleCodeChange}
@@ -74,8 +69,6 @@ function App() {
         extensions={[javascript({ jsx: true })]}
         lang="javascript"
       />
-
-
     </>
   )
 }
