@@ -1,11 +1,6 @@
-import { useState, useRef } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState, useRef } from 'react'
 import './App.css'
 
-function waveFunction(elapsedTime: number): number {
-  return Math.sin(2 * Math.PI * 440 * elapsedTime);
-}
 
 function App() {
   const [count, setCount] = useState(0)
@@ -24,7 +19,10 @@ function App() {
 
       // Using Array.prototype.forEach for functional iteration
       outputBuffer.forEach((_, index) => {
-        outputBuffer[index] = waveFunction(audioProcessingEvent.playbackTime + index / sampleRate!);
+        if (typeof window.wave === 'function') {
+          outputBuffer[index] = window.wave(audioProcessingEvent.playbackTime + index / sampleRate!);
+        }
+        
       });
     };
 
@@ -42,6 +40,26 @@ function App() {
     setIsPlaying(false);
   };
 
+  const [code, setCode] = useState(`function wave(t) {
+  return Math.sin(2 * Math.PI * 440 * t);
+}`);
+
+  useEffect(() => {
+    window.eval(code);
+  }, []);
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newCode = e.target.value;
+    setCode(newCode);
+    try {
+      //evaluate the code and make sure that if any functions are defined, they are available in the global scope
+      // eslint-disable-next-line
+      window.eval(newCode);
+    } catch (error) {
+      console.error('Invalid JavaScript code:', error);
+    }
+  };
+
   return (
     <>
       <h1>Simple Synth</h1>
@@ -49,6 +67,16 @@ function App() {
         <button onClick={isPlaying ? handleStopClick : handlePlayClick}>
           {isPlaying ? 'Stop' : 'Play'}
         </button>
+      </div>
+      <div className="editor">
+        <textarea
+          className="code-editor"
+          spellCheck="false"
+          style={{ width: '100ch', height: '100vh' }}
+          value={code}
+          onChange={handleCodeChange}
+          lang="javascript"
+        />
       </div>
     </>
   )
