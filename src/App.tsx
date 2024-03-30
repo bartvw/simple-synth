@@ -5,10 +5,9 @@ import './App.css'
 import initialCode from '../example.js?raw'
 
 function App() {
-  const [count, setCount] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false);
   const [code, setCode] = useState(initialCode);
-  
+
   useEffect(() => {
     window.eval(code);
   }, []);
@@ -26,10 +25,11 @@ function App() {
 
       // Using Array.prototype.forEach for functional iteration
       outputBuffer.forEach((_, index) => {
-        if (typeof window.wave === 'function') {
-          outputBuffer[index] = window.wave(audioProcessingEvent.playbackTime + index / sampleRate!);
+
+        if (typeof (window as any).wave === 'function') {
+          outputBuffer[index] = (window as any).wave(audioProcessingEvent.playbackTime + index / sampleRate!);
         }
-        
+
       });
     };
 
@@ -62,10 +62,10 @@ function App() {
 
   return (
     <>
-        <button onClick={isPlaying ? handleStopClick : handlePlayClick}>
-          {isPlaying ? '⏹️' : '▶️'}
-        </button>
-        <CodeMirror
+      <button onClick={isPlaying ? handleStopClick : handlePlayClick}>
+        {isPlaying ? '⏹️' : '▶️'}
+      </button>
+      <CodeMirror
         value={code}
         onUpdate={handleCodeChange}
         style={{ textAlign: 'left' }}
@@ -74,8 +74,8 @@ function App() {
         extensions={[javascript({ jsx: true })]}
         lang="javascript"
       />
-      
-    
+
+
     </>
   )
 }
