@@ -2,20 +2,16 @@ import { useEffect, useState, useRef } from 'react'
 import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript';
 import './App.css'
-
+import initialCode from '../example.js?raw'
 
 function App() {
   const [count, setCount] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false);
-
-  const [code, setCode] = useState(`function wave(t) {
-    return Math.sin(2 * Math.PI * 440 * t);
-  }`);
+  const [code, setCode] = useState(initialCode);
   
   useEffect(() => {
     window.eval(code);
   }, []);
-  
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const generatorRef = useRef<ScriptProcessorNode | null>(null);
@@ -66,21 +62,19 @@ function App() {
 
   return (
     <>
-      <h1>Simple Synth</h1>
-      <div className="card">
         <button onClick={isPlaying ? handleStopClick : handlePlayClick}>
-          {isPlaying ? 'Stop' : 'Play'}
+          {isPlaying ? '⏹️' : '▶️'}
         </button>
-      </div>
-      <CodeMirror
+        <CodeMirror
         value={code}
         onUpdate={handleCodeChange}
         style={{ textAlign: 'left' }}
-        height="200px"
-        width='800px'
+        height="600px"
+        width="800px"
         extensions={[javascript({ jsx: true })]}
         lang="javascript"
       />
+      
     
     </>
   )

@@ -21,9 +21,6 @@ function noteToFreq(note) {
     return factor * freqs[pitch];
 }
 
-/**
- * Monosynth
- */
 class MonoSynth {
     constructor(waveFunction, ampEnvelopeGenerator) {
         this.waveFunction = waveFunction;
@@ -65,9 +62,6 @@ class MonoSynth {
     }
 }
 
-/**
- * PolySynth (multiplexed monosynths)
- */
 class PolySynth {
     constructor(monosynthFunction, polyfony) {
         this.synths = [];
@@ -92,9 +86,6 @@ class PolySynth {
     }
 }
 
-/**
- * AD Envelope Generator
- */
 class AttackDecayEnvelope {
     constructor(attackTime, decayTime) {
         this.attackTime = attackTime;
@@ -129,9 +120,6 @@ class AttackDecayEnvelope {
     }
 }
 
-/**
- * StepSequencer
- */
 class StepSequencer {
     constructor(synth, bpm, pattern) {
         this.synth = synth;
@@ -155,9 +143,6 @@ class StepSequencer {
 }
 
 
-/**
- * Channel
- */
 class Channel {
     constructor(inputDsp, amp) {
         this.amp = amp;
@@ -169,9 +154,6 @@ class Channel {
     }
 }
 
-/**
- * Mixer
- */
 class Mixer {
     constructor(masterVolume) {
         this.channels = [];
@@ -192,26 +174,22 @@ class Mixer {
     }
 }
 
-/**
- * Wave functions
- */
 function sawtooth(t, freq) {
     return 2 * (t * freq - Math.floor(t * freq)) - 1;
+}
+
+function square(t, freq) {
+    return (t * freq - Math.floor(t * freq)) < 0.5 ? 1 : -1;
 }
 
 function sine(t, freq) {
     return Math.sin(t * freq);
 }
 
-/**
- * ---------------------------
- * Main
- * ---------------------------
- */
 const mainMixer = new Mixer(0.9);
 
 const synth = new PolySynth(
-    () => new MonoSynth(sawtooth, new AttackDecayEnvelope(0.02, 0.1)),
+    () => new MonoSynth(square, new AttackDecayEnvelope(0.02, 0.1)),
     4
 );
 mainMixer.addChannel(synth, 0.2);
@@ -233,13 +211,10 @@ const stepSequencer2 = new StepSequencer(
 ]
 );
 
-
-
 function wave(t) {
     stepSequencer.run(t);
-    //stepSequencer2.run(t);
+    stepSequencer2.run(t);
     bassDrumSequencer.run(t);
-
 
     return mainMixer.dsp(t);
 }
