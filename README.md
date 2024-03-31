@@ -7,3 +7,4 @@ Create sounds with JavaScript. Use code to generate a waveform and hear the resu
 The app will call the function `function wave(t)`, where t represents the elapsed time since the
 user pressed play. 
 
+[Try it!](https://bartvw.github.io/simple-synth/)
