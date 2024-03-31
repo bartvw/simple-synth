@@ -59,7 +59,10 @@ function App() {
       <button onClick={isPlaying ? handleStopClick : handlePlayClick}>
         {isPlaying ? '⏹️' : '▶️'}
       </button>
-      <p>Edit the <code>wave</code> function below to change the sound.</p>
+      <p>Edit the <code>wave</code> function below to change the sound. <br />
+      <a href="https://github.com/bartvw/simple-synth" target="_blank"><img src="github-mark.png" width="12px" alt="logo" /> source</a>
+      </p>
+      
       <CodeMirror
         value={code}
         onUpdate={handleCodeChange}
