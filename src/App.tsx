@@ -83,8 +83,9 @@ function App() {
       </main>
       <footer className="w-full bg-gray-100 p-2 bottom-0 sticky z-10">
 
-        <a href="https://github.com/bartvw/simple-synth"
-          target="_blank"><img src="github-mark.png" width="12px" alt="logo" className="inline" /> source</a>
+        <a href="https://github.com/bartvw/simple-synth" target="_blank">
+           <img src="github-mark.png" width="12px" alt="logo" className="inline" /> source
+        </a>
       </footer>
 
 
