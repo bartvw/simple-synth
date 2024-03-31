@@ -186,6 +186,10 @@ function sine(t, freq) {
     return Math.sin(t * freq);
 }
 
+function whitenoise(t) {
+     return Math.random() * 2 - 1;
+}
+
 const mainMixer = new Mixer(0.9);
 
 const synth = new PolySynth(
@@ -196,8 +200,11 @@ mainMixer.addChannel(synth, 0.2);
 
 const bassDrum = new MonoSynth(sine, new AttackDecayEnvelope(0.0, 0.3));
 bassDrum.setPitchEnvelope(new AttackDecayEnvelope(0.0, 0.2), 2.5);
-const bassDrumSequencer = new StepSequencer(bassDrum, 120, ['a3', null, null, null]);
-mainMixer.addChannel(bassDrum, 0.8);
+mainMixer.addChannel(bassDrum, 1.8);
+
+const hihat = new MonoSynth(whitenoise, new AttackDecayEnvelope(0.01, 0.1));
+mainMixer.addChannel(hihat, 0.2)
+
 
 const stepSequencer = new StepSequencer(
     synth, 120, [
@@ -211,9 +218,14 @@ const stepSequencer2 = new StepSequencer(
 ]
 );
 
+const bassDrumSequencer = new StepSequencer(bassDrum, 120, ['a3', null, null, null]);
+const hihatSequencer = new StepSequencer(hihat, 120, [null, null, 'a5', null])
+
+
 function wave(t) {
     stepSequencer.run(t);
     stepSequencer2.run(t);
+    hihatSequencer.run(t);
     bassDrumSequencer.run(t);
 
     return mainMixer.dsp(t);
